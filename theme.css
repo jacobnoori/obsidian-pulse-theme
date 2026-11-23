@@ -1,0 +1,803 @@
+/* =========================================================
+   Pulse — an Obsidian theme inspired by the Note Pulse dashboard
+   Violet accent, rose/peach highlights, soft card surfaces and
+   a radiant glow behind the main editing area.
+   Tab shapes are intentionally left untouched.
+   ========================================================= */
+
+/* @settings
+
+name: Pulse
+id: pulse-theme
+settings:
+  -
+    id: pulse-glow
+    title: Radiant glow strength
+    description: Intensity of the violet/rose glow behind notes (0 turns it off)
+    type: variable-number-slider
+    default: 1
+    min: 0
+    max: 2
+    step: 0.1
+  -
+    id: pulse-rose
+    title: Secondary glow colour
+    description: The warm colour paired with the accent (top-right glow, gradients)
+    type: variable-themed-color
+    format: hex
+    default-light: '#e0679f'
+    default-dark: '#f08cbb'
+  -
+    id: pulse-guides
+    title: Tree guide lines
+    description: The lines linking parent and child items in the file list and outline
+    type: class-select
+    allowEmpty: false
+    default: pulse-guides-always
+    options:
+      -
+        label: Always show
+        value: pulse-guides-always
+      -
+        label: Only while hovering the pane
+        value: pulse-guides-hover
+      -
+        label: Never show
+        value: pulse-guides-none
+  -
+    id: pulse-gradient-title
+    title: Gradient note titles
+    description: Paint the inline title with the accent → rose gradient
+    type: class-toggle
+    default: false
+  -
+    id: pulse-plain-h1
+    title: Plain H1 headings
+    description: Turn off the accent → rose gradient on top-level headings
+    type: class-toggle
+    default: false
+  -
+    id: pulse-code-edge
+    title: Gradient line on code blocks
+    description: Add a thin violet → rose → peach line along the top of code blocks
+    type: class-toggle
+    default: false
+  -
+    id: pulse-hide-code-label
+    title: Hide code block language labels
+    description: Remove the small language name (bash, yaml…) in the corner of code blocks
+    type: class-toggle
+    default: false
+  -
+    id: pulse-flat
+    title: Flat callouts
+    description: Turn off the tinted card styling for callouts
+    type: class-toggle
+    default: false
+
+*/
+
+/* ---------- Palette ---------- */
+body {
+  --accent-h: 258;
+  --accent-s: 88%;
+  --accent-l: 66%;
+
+  --pulse-glow: 1;
+  --pulse-radius: 12px;
+  --pulse-radius-s: 6px;
+  --pulse-accent: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
+  --pulse-accent-2: color-mix(in srgb, var(--pulse-accent) 40%, var(--pulse-rose));
+  --pulse-grad: linear-gradient(135deg, var(--pulse-accent), var(--pulse-accent-2));
+  --pulse-accent-soft: color-mix(in srgb, var(--pulse-accent) 14%, transparent);
+  --pulse-accent-softer: color-mix(in srgb, var(--pulse-accent) 7%, transparent);
+  --pulse-chip-bg: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--pulse-accent) 18%, transparent),
+    color-mix(in srgb, var(--pulse-rose) 13%, transparent)
+  );
+
+  --link-color: var(--text-accent);
+  --link-color-hover: var(--pulse-rose);
+  --link-external-color: var(--text-accent);
+  --link-external-color-hover: var(--pulse-rose);
+  --link-unresolved-opacity: 0.6;
+
+  --checkbox-radius: 5px;
+  --checkbox-color: var(--pulse-accent);
+  --checkbox-color-hover: var(--pulse-accent-2);
+
+  --tag-radius: 999px;
+  --tag-background: var(--pulse-chip-bg);
+  --tag-background-hover: color-mix(in srgb, var(--pulse-accent) 26%, transparent);
+  --tag-color: var(--text-accent);
+  --tag-color-hover: var(--text-normal);
+  --tag-border-width: 0;
+  --tag-padding-x: 0.6em;
+  --tag-padding-y: 0.15em;
+
+  --blockquote-border-thickness: 3px;
+  --blockquote-border-color: var(--pulse-accent);
+  --hr-color: color-mix(in srgb, var(--pulse-accent) 30%, var(--background-modifier-border));
+
+  --callout-radius: var(--pulse-radius);
+  --code-radius: var(--pulse-radius-s);
+  --modal-radius: var(--pulse-radius);
+  --prompt-border-width: 1px;
+  --input-radius: 8px;
+  --button-radius: 8px;
+
+  --h1-weight: 700;
+  --h2-weight: 700;
+  --h3-weight: 650;
+  --inline-title-weight: 700;
+  --heading-spacing: 1.6em;
+
+  --nav-item-radius: var(--pulse-radius-s);
+  --nav-item-color-active: var(--text-normal);
+  --nav-item-background-hover: var(--pulse-accent-softer);
+
+  --scrollbar-radius: 999px;
+}
+
+.theme-dark {
+  --pulse-rose: #f08cbb;
+  --pulse-peach: #f5b493;
+
+  --color-base-00: #17161c;
+  --color-base-05: #1a1920;
+  --color-base-10: #1e1c25;
+  --color-base-20: #23212b;
+  --color-base-25: #292632;
+  --color-base-30: #33303e;
+  --color-base-35: #3d394a;
+  --color-base-40: #4b4659;
+  --color-base-50: #6e6880;
+  --color-base-60: #8f899f;
+  --color-base-70: #b0abbf;
+  --color-base-100: #e6e3ee;
+
+  --background-primary: #1a1920;
+  --background-primary-alt: #211f28;
+  --background-secondary: #23212b;
+  --background-secondary-alt: #2a2733;
+  --background-modifier-border: #33303e;
+  --background-modifier-border-hover: #423d50;
+  --background-modifier-border-focus: color-mix(in srgb, var(--pulse-accent) 55%, transparent);
+  --background-modifier-hover: color-mix(in srgb, var(--pulse-accent) 9%, transparent);
+  --background-modifier-active-hover: color-mix(in srgb, var(--pulse-accent) 16%, transparent);
+  --background-modifier-form-field: #1e1c25;
+
+  --text-normal: #e6e3ee;
+  --text-muted: #b0abbf;
+  --text-faint: #7f7992;
+  --text-accent: color-mix(in srgb, var(--pulse-accent) 78%, #ffffff);
+  --text-accent-hover: var(--pulse-rose);
+  --text-selection: color-mix(in srgb, var(--pulse-accent) 32%, transparent);
+  --text-highlight-bg: color-mix(in srgb, var(--pulse-rose) 28%, transparent);
+
+  --titlebar-background: var(--background-secondary);
+  --titlebar-background-focused: var(--background-secondary);
+  --tab-container-background: var(--background-secondary);
+  --ribbon-background: var(--background-secondary);
+
+  --pulse-surface: color-mix(in srgb, var(--background-secondary) 70%, var(--background-primary));
+  --pulse-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.24);
+  --pulse-shadow-pop: 0 10px 34px rgba(0, 0, 0, 0.5),
+    0 0 0 1px color-mix(in srgb, var(--pulse-accent) 14%, transparent);
+  --pulse-glow-a: calc(20% * var(--pulse-glow));
+  --pulse-glow-b: calc(13% * var(--pulse-glow));
+  --pulse-glow-c: calc(8% * var(--pulse-glow));
+}
+
+.theme-light {
+  --pulse-rose: #e0679f;
+  --pulse-peach: #f2a07b;
+
+  --background-primary: #ffffff;
+  --background-primary-alt: #faf8fe;
+  --background-secondary: #f5f3fa;
+  --background-secondary-alt: #eeebf6;
+  --background-modifier-border: #e5e1ef;
+  --background-modifier-border-hover: #d6d0e5;
+  --background-modifier-border-focus: color-mix(in srgb, var(--pulse-accent) 55%, transparent);
+  --background-modifier-hover: color-mix(in srgb, var(--pulse-accent) 7%, transparent);
+  --background-modifier-active-hover: color-mix(in srgb, var(--pulse-accent) 13%, transparent);
+
+  --text-normal: #24212d;
+  --text-muted: #5f5a6d;
+  --text-faint: #8a849a;
+  --text-accent: color-mix(in srgb, var(--pulse-accent) 82%, #24212d);
+  --text-accent-hover: var(--pulse-rose);
+  --text-selection: color-mix(in srgb, var(--pulse-accent) 22%, transparent);
+  --text-highlight-bg: color-mix(in srgb, var(--pulse-rose) 22%, transparent);
+
+  --titlebar-background: var(--background-secondary);
+  --titlebar-background-focused: var(--background-secondary);
+  --tab-container-background: var(--background-secondary);
+  --ribbon-background: var(--background-secondary);
+
+  --pulse-surface: #ffffff;
+  --pulse-shadow: 0 1px 2px rgba(40, 20, 60, 0.04),
+    0 8px 24px color-mix(in srgb, var(--pulse-accent) 7%, transparent);
+  --pulse-shadow-pop: 0 10px 34px rgba(40, 20, 60, 0.16),
+    0 0 0 1px color-mix(in srgb, var(--pulse-accent) 12%, transparent);
+  --pulse-glow-a: calc(12% * var(--pulse-glow));
+  --pulse-glow-b: calc(9% * var(--pulse-glow));
+  --pulse-glow-c: calc(6% * var(--pulse-glow));
+}
+
+/* ---------- Radiant main area ---------- */
+.workspace-split.mod-root .workspace-leaf-content > .view-content {
+  background-color: var(--background-primary);
+  background-image:
+    radial-gradient(70% 60% at 0% 0%,
+      color-mix(in srgb, var(--pulse-accent) var(--pulse-glow-a), transparent), transparent 72%),
+    radial-gradient(60% 50% at 100% 0%,
+      color-mix(in srgb, var(--pulse-rose) var(--pulse-glow-b), transparent), transparent 72%),
+    radial-gradient(70% 45% at 85% 105%,
+      color-mix(in srgb, var(--pulse-peach) var(--pulse-glow-c), transparent), transparent 72%),
+    radial-gradient(60% 45% at 0% 100%,
+      color-mix(in srgb, var(--pulse-accent) var(--pulse-glow-c), transparent), transparent 72%);
+  background-repeat: no-repeat;
+}
+
+/* let the glow show through the editor and reader layers */
+.workspace-split.mod-root .view-content > .markdown-source-view,
+.workspace-split.mod-root .view-content > .markdown-reading-view,
+.workspace-split.mod-root .markdown-source-view .cm-editor,
+.workspace-split.mod-root .markdown-source-view .cm-scroller,
+.workspace-split.mod-root .markdown-preview-view,
+.workspace-split.mod-root .markdown-source-view .cm-gutters {
+  background-color: transparent;
+}
+
+.workspace-split.mod-root .view-header {
+  background-color: var(--background-primary);
+}
+
+/* ---------- Typography ---------- */
+.inline-title {
+  letter-spacing: -0.015em;
+}
+
+.pulse-gradient-title .inline-title {
+  background: linear-gradient(110deg, var(--text-normal) 0%, var(--text-accent) 55%, var(--pulse-rose) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ---------- Code syntax colours ----------
+   Deliberately few hues: keywords, strings and comments get colour;
+   everything else stays the normal text colour. */
+.theme-dark {
+  --code-normal: #e2dfea;
+  --code-comment: #8a849a;
+  --code-keyword: #c4b5ff;
+  --code-string: #a9d6bf;
+  --code-function: var(--code-normal);
+  --code-value: var(--code-normal);
+  --code-property: var(--code-normal);
+  --code-tag: var(--code-keyword);
+  --code-operator: var(--code-normal);
+  --code-punctuation: #a6a1b5;
+  --code-important: var(--code-keyword);
+}
+.theme-light {
+  --code-normal: #24212d;
+  --code-comment: #6f6982;
+  --code-keyword: #5233c9;
+  --code-string: #1c6e49;
+  --code-function: var(--code-normal);
+  --code-value: var(--code-normal);
+  --code-property: var(--code-normal);
+  --code-tag: var(--code-keyword);
+  --code-operator: var(--code-normal);
+  --code-punctuation: #625d72;
+  --code-important: var(--code-keyword);
+}
+.markdown-rendered pre code,
+.markdown-source-view.mod-cm6 .cm-line.HyperMD-codeblock {
+  color: var(--code-normal);
+}
+.markdown-rendered .token.comment,
+.cm-s-obsidian span.cm-comment {
+  font-style: italic;
+}
+
+/* ---------- Heading colours ---------- */
+.theme-dark {
+  --h1-color: #f1ecff;
+  --h2-color: #c4b5ff;
+  --h3-color: #f2a3c8;
+  --h4-color: #f5b996;
+  --h5-color: #a99bf0;
+  --h6-color: #b0abbf;
+}
+.theme-light {
+  --h1-color: #2a2140;
+  --h2-color: #5b3fd6;
+  --h3-color: #c2457f;
+  --h4-color: #c86a3c;
+  --h5-color: #7660d8;
+  --h6-color: #5f5a6d;
+}
+
+.markdown-rendered h1,
+.HyperMD-header-1,
+.markdown-rendered h2,
+.HyperMD-header-2 {
+  letter-spacing: -0.01em;
+}
+
+/* H1: accent → rose gradient text */
+body:not(.pulse-plain-h1) .markdown-rendered h1,
+body:not(.pulse-plain-h1) .markdown-source-view.mod-cm6 .cm-header-1:not(.cm-formatting-header) {
+  background-image: linear-gradient(100deg, var(--text-accent) 0%, var(--pulse-rose) 70%, var(--pulse-peach) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+body:not(.pulse-plain-h1) .markdown-rendered h1 {
+  width: fit-content;
+}
+body:not(.pulse-plain-h1) .markdown-rendered h1::after {
+  -webkit-text-fill-color: initial;
+}
+
+/* small gradient underline below h1/h2 in reading view */
+.markdown-rendered h1::after,
+.markdown-rendered h2::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 3px;
+  margin-top: 0.35em;
+  border-radius: 999px;
+  background: var(--pulse-grad);
+  opacity: 0.85;
+}
+
+/* heading markers (#) in live preview pick up the accent */
+.cm-formatting-header {
+  color: color-mix(in srgb, var(--pulse-accent) 60%, transparent) !important;
+}
+
+/* horizontal rules: a fading accent line */
+.markdown-rendered hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--hr-color) 20%, var(--hr-color) 80%, transparent);
+}
+
+/* links */
+.markdown-rendered a,
+.cm-s-obsidian span.cm-hmd-internal-link {
+  text-decoration-color: color-mix(in srgb, var(--pulse-accent) 40%, transparent);
+  text-underline-offset: 2px;
+}
+
+/* highlights */
+.markdown-rendered mark,
+.cm-s-obsidian span.cm-highlight {
+  border-radius: 4px;
+  padding: 0 2px;
+  color: inherit;
+}
+
+/* ---------- Tags as soft chips ---------- */
+a.tag,
+.cm-s-obsidian span.cm-hashtag {
+  font-weight: 500;
+  font-size: 0.85em;
+}
+
+/* ---------- Checkboxes ---------- */
+input[type="checkbox"] {
+  border-color: color-mix(in srgb, var(--pulse-accent) 45%, var(--background-modifier-border));
+}
+input[type="checkbox"]:checked {
+  background-image: var(--pulse-grad);
+  border-color: transparent;
+}
+
+/* ---------- Blockquotes ---------- */
+.markdown-rendered blockquote {
+  background: linear-gradient(90deg, var(--pulse-accent-softer), transparent 70%);
+  border-radius: 0 var(--pulse-radius-s) var(--pulse-radius-s) 0;
+  padding: 0.5em 1em;
+  border-inline-start-color: transparent;
+  border-image: linear-gradient(180deg, var(--pulse-accent), var(--pulse-rose)) 1;
+  border-image-width: 0 0 0 3px;
+}
+
+/* ---------- Callout cards ---------- */
+/* Obsidian 1.15 stores --callout-color as a hex value, so mix with color-mix() */
+body:not(.pulse-flat) .callout {
+  border: 1px solid color-mix(in srgb, var(--callout-color) 28%, transparent);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--callout-color) 16%, var(--pulse-surface)),
+    color-mix(in srgb, var(--callout-color) 5%, var(--pulse-surface)) 70%
+  );
+  /* no drop shadow: live preview clips it to a square box, leaving dark corners */
+  box-shadow: none;
+  mix-blend-mode: normal;
+}
+
+/* quote / cite callouts get the Note Pulse "hero" gradient */
+.callout[data-callout="quote"],
+.callout[data-callout="cite"] {
+  --callout-color: var(--pulse-accent);
+  --callout-icon: lucide-quote;
+  border: 1px solid color-mix(in srgb, var(--pulse-accent) 30%, transparent);
+  background:
+    radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--pulse-accent) 24%, transparent), transparent 60%),
+    radial-gradient(100% 120% at 100% 100%, color-mix(in srgb, var(--pulse-peach) 12%, transparent), transparent 60%),
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--pulse-accent) 14%, var(--pulse-surface)) 0%,
+      color-mix(in srgb, var(--pulse-rose) 11%, var(--pulse-surface)) 60%,
+      color-mix(in srgb, var(--pulse-peach) 8%, var(--pulse-surface)) 100%);
+  /* no drop shadow: live preview clips it to a square box, leaving dark corners */
+  box-shadow: none;
+  mix-blend-mode: normal;
+}
+.callout[data-callout="quote"] .callout-title,
+.callout[data-callout="cite"] .callout-title {
+  color: var(--text-accent);
+}
+.callout[data-callout="quote"] .callout-icon,
+.callout[data-callout="cite"] .callout-icon {
+  color: var(--pulse-rose);
+}
+.callout[data-callout="quote"] .callout-content,
+.callout[data-callout="cite"] .callout-content {
+  font-size: 1.05em;
+  font-style: italic;
+}
+.callout[data-callout="quote"] .callout-content p:last-child,
+.callout[data-callout="cite"] .callout-content p:last-child {
+  font-style: normal;
+  color: var(--text-muted);
+}
+
+/* ---------- Code blocks ----------
+   Calm by design: a solid, slightly recessed surface (no glow,
+   texture or shadow), a hairline border, and generous line spacing. */
+.theme-dark {
+  --pulse-code-bg: #141319;
+  --pulse-code-border: #2a2733;
+}
+.theme-light {
+  --pulse-code-bg: #f5f3f9;
+  --pulse-code-border: #e3dfec;
+}
+body {
+  --code-background: var(--pulse-code-bg);
+  --code-radius: 8px;
+  --pulse-code-line-height: 1.6;
+  --pulse-code-edge-img: none;
+}
+body.pulse-code-edge {
+  --pulse-code-edge-img: linear-gradient(90deg, var(--pulse-accent), var(--pulse-rose), var(--pulse-peach));
+}
+
+/* reading view */
+.markdown-rendered pre {
+  position: relative;
+  background-color: var(--pulse-code-bg);
+  background-image: var(--pulse-code-edge-img);
+  background-size: 100% 2px;
+  background-repeat: no-repeat;
+  border: 1px solid var(--pulse-code-border);
+  border-radius: 8px;
+  box-shadow: none;
+  padding: 1em 1.2em;
+}
+.markdown-rendered pre code {
+  line-height: var(--pulse-code-line-height);
+}
+
+/* live preview: code blocks are drawn line by line */
+.markdown-source-view.mod-cm6 .cm-line.HyperMD-codeblock {
+  background-color: var(--pulse-code-bg);
+  line-height: var(--pulse-code-line-height);
+  box-shadow:
+    inset 1px 0 0 var(--pulse-code-border),
+    inset -1px 0 0 var(--pulse-code-border);
+}
+.markdown-source-view.mod-cm6 .cm-line.HyperMD-codeblock-begin {
+  background-image: var(--pulse-code-edge-img);
+  background-size: 100% 2px;
+  background-repeat: no-repeat;
+  padding-top: 0.4em;
+  box-shadow:
+    inset 1px 0 0 var(--pulse-code-border),
+    inset -1px 0 0 var(--pulse-code-border),
+    inset 0 1px 0 var(--pulse-code-border);
+}
+.markdown-source-view.mod-cm6 .cm-line.HyperMD-codeblock-end {
+  padding-bottom: 0.4em;
+  box-shadow:
+    inset 1px 0 0 var(--pulse-code-border),
+    inset -1px 0 0 var(--pulse-code-border),
+    inset 0 -1px 0 var(--pulse-code-border);
+}
+
+/* language label: small and faint in the top-right corner */
+.markdown-source-view.mod-cm6 .code-block-flair {
+  color: var(--text-faint);
+  font-size: var(--font-smallest);
+  font-family: var(--font-interface);
+  letter-spacing: 0.04em;
+}
+.markdown-rendered pre[class*="language-"]::before {
+  position: absolute;
+  top: 0.45em;
+  right: 0.8em;
+  font-family: var(--font-interface);
+  font-size: var(--font-smallest);
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  pointer-events: none;
+}
+.markdown-rendered pre[class*="language-"]:hover::before {
+  opacity: 0; /* make room for the copy button */
+}
+.markdown-rendered pre.language-bash::before { content: "bash"; }
+.markdown-rendered pre.language-sh::before { content: "sh"; }
+.markdown-rendered pre.language-shell::before { content: "shell"; }
+.markdown-rendered pre.language-zsh::before { content: "zsh"; }
+.markdown-rendered pre.language-fish::before { content: "fish"; }
+.markdown-rendered pre.language-powershell::before { content: "powershell"; }
+.markdown-rendered pre.language-ps1::before { content: "ps1"; }
+.markdown-rendered pre.language-batch::before { content: "batch"; }
+.markdown-rendered pre.language-bat::before { content: "bat"; }
+.markdown-rendered pre.language-cmd::before { content: "cmd"; }
+.markdown-rendered pre.language-sql::before { content: "sql"; }
+.markdown-rendered pre.language-vim::before { content: "vim"; }
+.markdown-rendered pre.language-ini::before { content: "ini"; }
+.markdown-rendered pre.language-conf::before { content: "conf"; }
+.markdown-rendered pre.language-toml::before { content: "toml"; }
+.markdown-rendered pre.language-yaml::before { content: "yaml"; }
+.markdown-rendered pre.language-yml::before { content: "yml"; }
+.markdown-rendered pre.language-json::before { content: "json"; }
+.markdown-rendered pre.language-xml::before { content: "xml"; }
+.markdown-rendered pre.language-html::before { content: "html"; }
+.markdown-rendered pre.language-css::before { content: "css"; }
+.markdown-rendered pre.language-javascript::before { content: "javascript"; }
+.markdown-rendered pre.language-js::before { content: "js"; }
+.markdown-rendered pre.language-typescript::before { content: "typescript"; }
+.markdown-rendered pre.language-ts::before { content: "ts"; }
+.markdown-rendered pre.language-python::before { content: "python"; }
+.markdown-rendered pre.language-py::before { content: "py"; }
+.markdown-rendered pre.language-markdown::before { content: "markdown"; }
+.markdown-rendered pre.language-md::before { content: "md"; }
+.markdown-rendered pre.language-http::before { content: "http"; }
+.markdown-rendered pre.language-apache::before { content: "apache"; }
+.markdown-rendered pre.language-nginx::before { content: "nginx"; }
+.markdown-rendered pre.language-dockerfile::before { content: "dockerfile"; }
+.markdown-rendered pre.language-docker::before { content: "docker"; }
+.markdown-rendered pre.language-go::before { content: "go"; }
+.markdown-rendered pre.language-rust::before { content: "rust"; }
+.markdown-rendered pre.language-lua::before { content: "lua"; }
+.markdown-rendered pre.language-diff::before { content: "diff"; }
+.markdown-rendered pre.language-csharp::before { content: "csharp"; }
+.markdown-rendered pre.language-cs::before { content: "cs"; }
+.markdown-rendered pre.language-java::before { content: "java"; }
+.markdown-rendered pre.language-c::before { content: "c"; }
+.markdown-rendered pre.language-cpp::before { content: "cpp"; }
+.markdown-rendered pre.language-php::before { content: "php"; }
+.markdown-rendered pre.language-ruby::before { content: "ruby"; }
+.markdown-rendered pre.language-hcl::before { content: "hcl"; }
+.markdown-rendered pre.language-terraform::before { content: "terraform"; }
+body.pulse-hide-code-label .markdown-rendered pre::before {
+  content: none;
+}
+body.pulse-hide-code-label .markdown-source-view.mod-cm6 .code-block-flair {
+  display: none;
+}
+
+.markdown-rendered :not(pre) > code,
+.cm-s-obsidian span.cm-inline-code {
+  color: var(--pulse-rose);
+  background-color: color-mix(in srgb, var(--pulse-rose) 10%, transparent);
+  border-radius: 4px;
+}
+
+/* tables: plain, matching code blocks — solid recessed surface,
+   hairline borders, a quiet solid header, no gradients or hover wash */
+.markdown-rendered table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--pulse-code-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--pulse-code-bg);
+}
+.markdown-rendered th,
+.markdown-rendered td {
+  border: none;
+  border-bottom: 1px solid var(--pulse-code-border);
+}
+.markdown-rendered th + th,
+.markdown-rendered td + td {
+  border-left: 1px solid var(--pulse-code-border);
+}
+.markdown-rendered tr:last-child td {
+  border-bottom: none;
+}
+/* :nth-child(n) matches Obsidian's alternating-column header rule so every
+   header cell gets the same colour */
+.markdown-rendered thead tr > th:nth-child(n) {
+  background: color-mix(in srgb, var(--text-normal) 4%, var(--pulse-code-bg));
+  color: var(--text-normal);
+  font-weight: 600;
+}
+
+/* embeds / transclusions */
+.markdown-embed {
+  border-radius: var(--pulse-radius-s);
+}
+
+/* ---------- Buttons & controls ---------- */
+button.mod-cta,
+.mod-cta {
+  background-image: var(--pulse-grad);
+  border: none;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--pulse-accent) 30%, transparent);
+}
+button.mod-cta:hover {
+  filter: brightness(1.08);
+}
+
+.checkbox-container.is-enabled {
+  background-image: var(--pulse-grad);
+}
+
+input[type="text"]:focus,
+input[type="search"]:focus,
+textarea:focus {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--pulse-accent) 35%, transparent);
+}
+
+/* ---------- Sidebars ---------- */
+/* active file / outline heading: a plain soft fill, no edge bar */
+body {
+  --nav-item-background-active: color-mix(in srgb, var(--pulse-accent) 16%, transparent);
+}
+
+/* ---------- Tree guides (file explorer, outline, search, tags…) ----------
+   Obsidian pulls each nested row left with a forced inline margin, so the
+   row highlight normally runs over the parent's guide line. Here the row's
+   own background is cleared and the highlight is drawn as a pill that starts
+   just right of the nearest guide, so the lines stay unbroken. */
+body {
+  --pulse-guide: color-mix(in srgb, var(--text-normal) 8%, transparent);
+  --pulse-guide-active: color-mix(in srgb, var(--pulse-accent) 55%, transparent);
+  --nav-indentation-guide-color: var(--pulse-guide);
+  /* one indent step = children margin + padding + guide width (17px by default) */
+  --pulse-indent: calc(var(--nav-item-children-margin-start) + var(--nav-item-children-padding-start) + var(--nav-indentation-guide-width));
+  /* x of the first-level guide, measured from the row's left edge */
+  --pulse-guide-x0: calc(var(--nav-item-children-margin-start) + var(--nav-indentation-guide-width));
+  --pulse-pill-gap: 3px;
+}
+
+.tree-item-self {
+  --pulse-pill-start: 0px;
+  isolation: isolate;
+}
+.tree-item-self,
+.tree-item-self:hover,
+.tree-item-self.is-clickable:hover,
+.tree-item-self.is-active,
+.tree-item-self.is-selected,
+.tree-item-self.is-being-renamed {
+  background-color: transparent !important;
+}
+.tree-item-self::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 var(--pulse-pill-start);
+  border-radius: var(--nav-item-radius);
+  background-color: transparent;
+  pointer-events: none;
+  z-index: -1;
+  transition: background-color 120ms ease;
+}
+.tree-item-self.is-clickable:hover::before {
+  background-color: var(--nav-item-background-hover);
+}
+.tree-item-self.is-selected::before {
+  background-color: var(--nav-item-background-selected, var(--nav-item-background-active));
+}
+.tree-item-self.is-active::before {
+  background-color: var(--nav-item-background-active);
+}
+
+/* pill start per nesting depth */
+.tree-item-children > .tree-item > .tree-item-self { --pulse-pill-start: calc(var(--pulse-guide-x0) + var(--pulse-indent) * 0 + var(--pulse-pill-gap)); }
+.tree-item-children .tree-item-children > .tree-item > .tree-item-self { --pulse-pill-start: calc(var(--pulse-guide-x0) + var(--pulse-indent) * 1 + var(--pulse-pill-gap)); }
+.tree-item-children .tree-item-children .tree-item-children > .tree-item > .tree-item-self { --pulse-pill-start: calc(var(--pulse-guide-x0) + var(--pulse-indent) * 2 + var(--pulse-pill-gap)); }
+.tree-item-children .tree-item-children .tree-item-children .tree-item-children > .tree-item > .tree-item-self { --pulse-pill-start: calc(var(--pulse-guide-x0) + var(--pulse-indent) * 3 + var(--pulse-pill-gap)); }
+.tree-item-children .tree-item-children .tree-item-children .tree-item-children .tree-item-children > .tree-item > .tree-item-self { --pulse-pill-start: calc(var(--pulse-guide-x0) + var(--pulse-indent) * 4 + var(--pulse-pill-gap)); }
+.tree-item-children .tree-item-children .tree-item-children .tree-item-children .tree-item-children .tree-item-children > .tree-item > .tree-item-self { --pulse-pill-start: calc(var(--pulse-guide-x0) + var(--pulse-indent) * 5 + var(--pulse-pill-gap)); }
+.tree-item-children .tree-item-children .tree-item-children .tree-item-children .tree-item-children .tree-item-children .tree-item-children > .tree-item > .tree-item-self { --pulse-pill-start: calc(var(--pulse-guide-x0) + var(--pulse-indent) * 6 + var(--pulse-pill-gap)); }
+.tree-item-children .tree-item-children .tree-item-children .tree-item-children .tree-item-children .tree-item-children .tree-item-children .tree-item-children > .tree-item > .tree-item-self { --pulse-pill-start: calc(var(--pulse-guide-x0) + var(--pulse-indent) * 7 + var(--pulse-pill-gap)); }
+
+/* guides: quiet hairline; the guide holding the current file/heading turns violet */
+.tree-item-children {
+  transition: border-color 150ms ease;
+}
+.tree-item-children:has(> .tree-item > .tree-item-self.is-active) {
+  border-inline-start-color: var(--pulse-guide-active);
+}
+
+/* Style Settings: show guides only on hover, or never */
+body.pulse-guides-hover {
+  --nav-indentation-guide-color: transparent;
+}
+body.pulse-guides-hover .workspace-leaf-content:hover {
+  --nav-indentation-guide-color: var(--pulse-guide);
+}
+body.pulse-guides-none {
+  --nav-indentation-guide-color: transparent;
+}
+body.pulse-guides-none .tree-item-children:has(> .tree-item > .tree-item-self.is-active) {
+  border-inline-start-color: transparent;
+}
+
+.workspace-ribbon .side-dock-ribbon-action:hover,
+.clickable-icon:hover {
+  color: var(--text-normal);
+}
+
+/* ---------- Modals, menus, prompts ---------- */
+.modal,
+.prompt {
+  border: 1px solid color-mix(in srgb, var(--pulse-accent) 18%, var(--background-modifier-border));
+  box-shadow: var(--pulse-shadow-pop);
+  background-image: radial-gradient(
+    600px 260px at 0% 0%,
+    color-mix(in srgb, var(--pulse-accent) 8%, transparent),
+    transparent 70%
+  );
+}
+
+.menu {
+  border-radius: 10px;
+  box-shadow: var(--pulse-shadow-pop);
+}
+
+.suggestion-item.is-selected,
+.menu-item.selected:not(.is-disabled):not(.is-label) {
+  background: var(--pulse-chip-bg);
+}
+
+.suggestion-highlight {
+  color: var(--text-accent);
+}
+
+/* settings: active nav item */
+.vertical-tab-nav-item.is-active {
+  background: var(--pulse-chip-bg);
+  color: var(--text-normal);
+}
+
+/* ---------- Scrollbars ---------- */
+body:not(.native-scrollbars) ::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--text-normal) 12%, transparent);
+}
+body:not(.native-scrollbars) ::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--pulse-accent) 45%, transparent);
+}
+
+/* ---------- Graph view ---------- */
+.graph-view.color-fill {
+  color: var(--pulse-accent);
+}
+.graph-view.color-fill-focused,
+.graph-view.color-line-highlight {
+  color: var(--pulse-rose);
+}
